@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import pandas as pd
 
+
 # --- helpers ---
 def clean_price(price):
     if price:
@@ -17,6 +18,7 @@ def clean_price(price):
             return None
     return None
 
+
 def clean_area(area):
     if area:
         area = area.replace("м²", "").replace(",", ".")
@@ -24,6 +26,12 @@ def clean_area(area):
             return float(area)
         except:
             return None
+    return None
+
+
+def clean_floor(floor):
+    if floor:
+        return floor.replace(":", "").strip()
     return None
 
 
@@ -41,11 +49,14 @@ ads = wait.until(
 
 data = []
 
-for ad in ads[:10]:  # для тесту беремо 10
+for ad in ads[:10]:  # беремо 10 для тесту
     try:
-        title = ad.find_element(By.CSS_SELECTOR, "a").text
+        title = ad.find_element(By.CSS_SELECTOR, "h6").text
     except:
-        title = None
+        try:
+            title = ad.text.split("\n")[0]
+        except:
+            title = None
 
     try:
         price_raw = ad.find_element(By.CSS_SELECTOR, "[data-testid='ad-price']").text
@@ -55,10 +66,13 @@ for ad in ads[:10]:  # для тесту беремо 10
 
     try:
         location = ad.find_element(By.CSS_SELECTOR, "[data-testid='location-date']").text
-        city = location.split(",")[0]
+        parts = location.split(",")
+        city = parts[0] if len(parts) > 0 else None
+        district = parts[1] if len(parts) > 1 else None
     except:
         location = None
         city = None
+        district = None
 
     try:
         link = ad.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
@@ -91,14 +105,15 @@ for ad in ads[:10]:  # для тесту беремо 10
             # --- floor ---
             if "Поверх" in page_text:
                 try:
-                    floor = page_text.split("Поверх")[1].split("\n")[0].strip()
+                    floor_raw = page_text.split("Поверх")[1].split("\n")[0]
+                    floor = clean_floor(floor_raw)
                 except:
                     floor = None
 
             # --- total floors ---
-            if "Поверхів" in page_text:
+            if "Поверхів" in page_text or "поверхів" in page_text:
                 try:
-                    total_floors = page_text.split("Поверхів")[1].split("\n")[0].strip()
+                    total_floors = page_text.split("Поверхів")[-1].split("\n")[0].strip()
                 except:
                     total_floors = None
 
@@ -113,6 +128,7 @@ for ad in ads[:10]:  # для тесту беремо 10
         "price": price,
         "location": location,
         "city": city,
+        "district": district,
         "link": link,
         "area": area,
         "floor": floor,

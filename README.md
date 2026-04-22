@@ -68,3 +68,7 @@ The result is a structured dataset saved as: olx_data.csv
 - Add pagination to collect more data
 - Export data directly to Google Sheets
 - Improve parsing accuracy for additional attributes
+
+## Results
+
+- Google Sheets: https://docs.google.com/spreadsheets/d/19-8VyEZadP7McRNK3XuH6Rb-43BrqjN7HFV47Z8Tmi8/edit?usp=sharing
