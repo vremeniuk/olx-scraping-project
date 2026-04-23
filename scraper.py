@@ -42,14 +42,14 @@ wait = WebDriverWait(driver, 10)
 url = "https://www.olx.ua/uk/nedvizhimost/kvartiry/kiev/"
 driver.get(url)
 
-# --- знайти оголошення ---
+# --- find an ad ---
 ads = wait.until(
     EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-cy='l-card']"))
 )
 
 data = []
 
-for ad in ads[:10]:  # беремо 10 для тесту
+for ad in ads[:10]:  # take 10 ads for testing
     try:
         title = ad.find_element(By.CSS_SELECTOR, "h6").text
     except:
@@ -79,7 +79,7 @@ for ad in ads[:10]:  # беремо 10 для тесту
     except:
         link = None
 
-    # --- деталі ---
+    # --- details ---
     area = None
     floor = None
     total_floors = None
@@ -136,7 +136,7 @@ for ad in ads[:10]:  # беремо 10 для тесту
     })
 
 
-# --- збереження ---
+# --- save data ---
 df = pd.DataFrame(data)
 df.to_csv("olx_data.csv", index=False, sep=";")
 
